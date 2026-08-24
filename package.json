@@ -1,0 +1,17 @@
+{
+  "name": "parvanerazaghiart",
+  "private": true,
+  "description": "Parvane Razaghi Art — NestJS + Next.js monorepo",
+  "scripts": {
+    "dev:backend": "pnpm --dir backend start:dev",
+    "dev:frontend": "pnpm --dir frontend dev",
+    "build:backend": "pnpm --dir backend build",
+    "build:frontend": "pnpm --dir frontend build",
+    "prisma:generate": "pnpm --dir backend prisma:generate"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@10.27.0"
+}

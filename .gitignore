@@ -1,0 +1,87 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+.pnpm-store/
+.pnpm-store-alt/
+.pnpm-cache/
+.pnpm-cache-alt/
+prisma-engines-manual/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+!.env*.example
+Local Info.txt
+Server Info.txt
+*.pem
+*.key
+credentials*.json
+
+# Build / output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.turbo/
+.vercel/
+.output/
+*.tsbuildinfo
+
+# NestJS
+coverage/
+.nyc_output/
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
+prisma/migrations/**/migration_lock.toml.bak
+
+# Logs & debug
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+
+# Testing / cache
+.cache/
+.eslintcache
+.prettiercache
+*.lcov
+
+# Uploads / media (local)
+uploads/
+public/uploads/
+storage/
+.tmp/
+.tmp-pnpm-store/
+**/.tmp-pnpm-store/
+.tmp-npm-cache/
+**/.tmp-npm-cache/
+temp/
+docs/.pkg-cache/
+docs/.copy-nm-done.txt
+
+# Local operator files (not product source)
+gapgpt prompt.txt
+master prompt.txt
+npm-proxy.ps1
+
+# Docker (local overrides)
+docker-compose.override.yml

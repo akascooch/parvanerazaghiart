@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ArtworkStatus {
+  DRAFT
+  PUBLISHED
+  SOLD
+}
+
+enum UserRole {
+  ADMIN
+}
+
+enum MediaKind {
+  IMAGE
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  phone         String?        @unique
+  passwordHash  String
+  name          String?
+  role          UserRole       @default(ADMIN)
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("refresh_tokens")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  artworks    Artwork[]
+
+  @@index([isActive])
+  @@map("categories")
+}
+
+model Artwork {
+  id             String        @id @default(cuid())
+  title          String
+  slug           String        @unique
+  description    String?
+  price          Decimal?      @db.Decimal(12, 2)
+  isPriceVisible Boolean       @default(false)
+  status         ArtworkStatus @default(DRAFT)
+  medium         String?
+  technique      String?
+  dimensions     String?
+  collection     String?
+  year           Int?
+  categoryId     String?
+  category       Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  media          Media[]
+  inquiries      Inquiry[]
+  deletedAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([status])
+  @@index([categoryId])
+  @@index([collection])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("artworks")
+}
+
+model Media {
+  id         String    @id @default(cuid())
+  artworkId  String
+  artwork    Artwork   @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  storageKey String    @unique
+  url        String
+  mimeType   String
+  sizeBytes  Int
+  kind       MediaKind @default(IMAGE)
+  alt        String?
+  width      Int?
+  height     Int?
+  sortOrder  Int       @default(0)
+  isPrimary  Boolean   @default(false)
+  variants   Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([artworkId])
+  @@index([artworkId, sortOrder])
+  @@map("media")
+}
+
+enum InquiryStatus {
+  NEW
+  READ
+  CLOSED
+}
+
+model Inquiry {
+  id          String        @id @default(cuid())
+  name        String
+  contact     String
+  message     String
+  artworkSlug String?
+  artworkId   String?
+  artwork     Artwork?      @relation(fields: [artworkId], references: [id], onDelete: SetNull)
+  ipHash      String?
+  userAgent   String?
+  status      InquiryStatus @default(NEW)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([artworkId])
+  @@map("inquiries")
+}

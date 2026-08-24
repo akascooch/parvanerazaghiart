@@ -1,0 +1,35 @@
+# compiled output
+/dist
+/node_modules
+/build
+
+# env & secrets
+.env
+.env.*
+!.env.example
+!.env*.example
+Local Info.txt
+Server Info.txt
+*.pem
+*.key
+
+# logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# tests
+/coverage
+/.nyc_output
+
+# prisma / local engines
+/prisma-engines-manual
+
+# uploads
+/uploads
+/storage
