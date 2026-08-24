@@ -73,6 +73,9 @@ pnpm --dir frontend start
 9. Use `ecosystem.config.cjs` with PM2 (`node dist/main.js` and `next start`). Keep `instances: 1` until Redis backs rate limits.
 10. Install the Nginx template in `docs/nginx/parvanerazaghiart.conf` after TLS files exist.
 11. Follow `docs/PRISMA_LINUX.md`: `prisma generate` on Linux, then `prisma migrate deploy` only.
+12. Follow `docs/LINUX_RUNBOOK.md` and `scripts/deploy.sh` on the Linux host.
+    Generate secrets with `scripts/init-prod-env.sh` (independent JWT / media /
+    inquiry secrets). See `docs/IMAGE_PIPELINE.md` for optional `sharp`.
 
 ## Intentionally deferred
 

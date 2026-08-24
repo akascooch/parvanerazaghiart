@@ -7,8 +7,9 @@
  * Rate limiting is in-process memory. Keep `instances: 1` (fork) until Redis
  * is introduced. Do not set wait_ready: Nest does not send process.send('ready').
  *
- * Do not use pnpm/npm as PID 1. Nest loads `backend/.env` from cwd.
- * Next loads `frontend/.env.production` / `.env.local` from cwd.
+ * Do not use pnpm/npm as PID 1. Nest loads `.env.production` then `.env` from cwd.
+ * Next loads `frontend/.env.production` from cwd.
+ * Bind HOST=127.0.0.1 so Nginx is the only public listener.
  * Logs are written under <repo>/logs (gitignored, not a public web root).
  */
 const path = require('path');
@@ -35,6 +36,12 @@ module.exports = {
       kill_timeout: 8000,
       env: {
         NODE_ENV: 'production',
+        HOST: '127.0.0.1',
+        PORT: '3001',
+      },
+      env_production: {
+        NODE_ENV: 'production',
+        HOST: '127.0.0.1',
         PORT: '3001',
       },
       out_file: path.join(logs, 'api-out.log'),
@@ -46,7 +53,7 @@ module.exports = {
       name: 'parvanerazaghiart-web',
       cwd: path.join(root, 'frontend'),
       script: './node_modules/next/dist/bin/next',
-      args: 'start -p 3000',
+      args: 'start -p 3000 -H 127.0.0.1',
       interpreter: 'node',
       instances: 1,
       exec_mode: 'fork',
@@ -60,6 +67,12 @@ module.exports = {
       kill_timeout: 8000,
       env: {
         NODE_ENV: 'production',
+        HOST: '127.0.0.1',
+        PORT: '3000',
+      },
+      env_production: {
+        NODE_ENV: 'production',
+        HOST: '127.0.0.1',
         PORT: '3000',
       },
       out_file: path.join(logs, 'web-out.log'),

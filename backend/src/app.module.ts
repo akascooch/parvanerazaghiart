@@ -15,7 +15,7 @@ import { HttpExceptionFilter } from './common/http-exception.filter';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
+      envFilePath: ['.env.production', '.env'],
     }),
     PrismaModule,
     AuthModule,
