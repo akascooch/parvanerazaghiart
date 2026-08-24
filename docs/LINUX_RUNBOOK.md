@@ -51,16 +51,30 @@ mkdir -p logs backend/storage/media
 
 ## 4. Deploy
 
-Back up PostgreSQL first. Then:
+Back up PostgreSQL first. Optional pre-flight (no mutate):
+
+```bash
+./scripts/deploy.sh --check
+```
+
+Then:
 
 ```bash
 ./scripts/deploy.sh
 ```
 
-The script: checks `node`/`pnpm`/`pm2`/`nginx`/`psql`, frozen installs,
-`prisma generate`, `prisma migrate deploy` (abort on failure), builds both
-apps, `pm2 startOrReload ecosystem.config.cjs --env production`, then
-`curl -f http://127.0.0.1:3000/api/health`.
+The script: checks `node`/`pnpm`/`pm2`/`curl` (nginx/psql/openssl are
+warnings if missing). Frozen installs, Linux `prisma generate` via
+`pnpm exec`, `prisma migrate deploy` (abort on failure before build/PM2),
+builds both apps, `pm2 startOrReload` **only** `parvanerazaghiart-api` and
+`parvanerazaghiart-web` (`instances: 1` is intentional — in-process rate
+limits), then loopback health on `:3000/api/health` and `:3001/api/health`.
+Failed health after reload is **not** auto-rolled-back; restore the previous
+git tag / release directory and rerun deploy.
+
+`./scripts/deploy.sh --check` validates env and paths only.
+
+There is no automatic rollback. Use git tags / release directories.
 
 Optional image optimization: `INSTALL_SHARP=1 ./scripts/deploy.sh`
 (see `docs/IMAGE_PIPELINE.md`).

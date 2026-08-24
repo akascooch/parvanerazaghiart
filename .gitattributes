@@ -1,0 +1,4 @@
+# Keep POSIX shell scripts as LF so Linux bash does not see CR in shebangs.
+*.sh text eol=lf
+*.cjs text eol=lf
+*.md text eol=lf
