@@ -86,3 +86,9 @@ npm-proxy.ps1
 
 # Docker (local overrides)
 docker-compose.override.yml
+
+# Transfer packages (local dumps / credential stubs must not be committed)
+versions/**/*.dump
+versions/**/.pgpass*
+versions/**/*-sensitive.zip
+versions/**/_stage*/

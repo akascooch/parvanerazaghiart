@@ -1,0 +1,4 @@
+filename  sha256  bytes  note
+Local Info.txt  (present-on-disk-not-in-project-zip)  n/a  encrypt-before-copy
+Server Info.txt  (present-on-disk-not-in-project-zip)  n/a  encrypt-before-copy
+local-parvanerazaghiart-20260824-1351.dump  d795f60661c347fd854215be00927a76b31f223f39a6190aae3d53ece45c9f5f  21364  local-pg-custom-format-not-production

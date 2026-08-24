@@ -1,0 +1,12 @@
+﻿commit 3d79e19020008792a903f60176dc62c394d996a2
+Author:     Amirali "scooch" Hosseini <132556178+akascooch@users.noreply.github.com>
+AuthorDate: Mon Aug 24 13:21:35 2026 +0330
+Commit:     Amirali "scooch" Hosseini <132556178+akascooch@users.noreply.github.com>
+CommitDate: Mon Aug 24 13:21:35 2026 +0330
+
+    chore(deploy): harden deployment automation and secret handling
+
+A	.gitattributes
+M	docs/LINUX_RUNBOOK.md
+M	scripts/deploy.sh
+M	scripts/init-prod-env.sh

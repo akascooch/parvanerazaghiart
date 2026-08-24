@@ -1,0 +1,28 @@
+SENSITIVE ZIP WAS NOT CREATED IN THE CURSOR SESSION.
+
+Reason:
+- 7-Zip is installed, but this environment cannot collect an encryption password
+  interactively without writing it to a file, a command line, or chat history.
+- Unencrypted archives of Local Info.txt, Server Info.txt, or the local database
+  dump are forbidden.
+
+What you must do on this PC (or the destination PC before copying secrets):
+
+1. Run PowerShell outside Cursor:
+
+   cd C:\Users\a.hosseini\Desktop\apk\parvanerazaghiart\versions\v.1.0.0
+   .\create-sensitive-archive.ps1
+
+2. Enter a strong password at the 7-Zip prompt (AES-256).
+   Do not put that password in Git, chat, or TRANSFER_README.
+
+3. Confirm parvanerazaghiart-v1.0.0-sensitive.zip exists, then copy it
+   separately from the project ZIP.
+
+4. Do not copy Local Info.txt, Server Info.txt, or *.dump on USB/email
+   unless they are inside that encrypted ZIP.
+
+Do not include:
+- private SSH keys
+- real .env / .env.production files
+- shell history

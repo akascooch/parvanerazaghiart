@@ -1,0 +1,5 @@
+﻿3d79e19 (HEAD -> main) chore(deploy): harden deployment automation and secret handling
+a683f3c feat(deploy): add automated deployment script, secret generator, and Linux runbook
+967f787 chore(release): verify local production runtime and harden deployment artifacts
+778cfc5 feat(infra): add pm2 ecosystem, nginx template, and fix metadata/seo bugs
+3173d85 chore: establish project baseline
