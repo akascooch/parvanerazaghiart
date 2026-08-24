@@ -60,11 +60,13 @@ describe('Admin artworks (e2e)', () => {
   });
 
   it('rejects invalid create payloads', async () => {
-    await request(app.getHttpServer())
+    const res = await request(app.getHttpServer())
       .post('/api/admin/artworks')
       .set('Authorization', `Bearer ${accessToken}`)
       .send({ title: 'A' })
       .expect(400);
+    expect(res.body.message).toBe('Please check the form and try again.');
+    expect(JSON.stringify(res.body)).not.toMatch(/must be|CreateArtwork/i);
   });
 
   it('creates, lists, and soft-deletes an artwork', async () => {

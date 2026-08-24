@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { fetchPublicGallery } from '@/lib/public-gallery';
-import { siteName, siteUrl } from '@/lib/site';
+import { defaultOgImage, siteName, siteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,8 +27,14 @@ export async function generateMetadata({
       description,
       url: siteUrl(canonical),
       type: 'website',
+      images: [defaultOgImage],
     },
-    twitter: { card: 'summary_large_image', title: 'Gallery', description },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Gallery',
+      description,
+      images: [defaultOgImage.url],
+    },
   };
 }
 

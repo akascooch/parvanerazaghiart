@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArtworkLightbox } from '@/components/gallery/ArtworkLightbox';
 import { InquiryForm } from '@/components/public/InquiryForm';
 import { fetchPublicArtwork, formatPublicPrice } from '@/lib/public-gallery';
-import { serializeJsonLd, siteName, siteUrl } from '@/lib/site';
+import { absoluteUrl, ogImages, serializeJsonLd, siteName, siteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +23,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .filter(Boolean)
       .join(' · ');
   const canonical = `/gallery/${artwork.slug}`;
+  const images = ogImages(
+    image
+      ? { url: image.src.preview, alt: image.alt, width: image.width ?? undefined }
+      : undefined,
+  );
   return {
     title: artwork.title,
     description,
@@ -32,15 +37,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: siteUrl(canonical),
       type: 'article',
-      images: image
-        ? [{ url: image.src.preview, alt: image.alt, width: image.width ?? undefined }]
-        : undefined,
+      images,
     },
     twitter: {
       card: 'summary_large_image',
       title: artwork.title,
       description,
-      images: image ? [image.src.preview] : undefined,
+      images: images.map((item) => item.url),
     },
   };
 }
@@ -55,6 +58,7 @@ export default async function ArtworkDetailPage({ params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'VisualArtwork',
     name: artwork.title,
+    url: siteUrl(`/gallery/${artwork.slug}`),
     description: artwork.description,
     artMedium: artwork.technique ?? artwork.medium,
     dateCreated: artwork.year ? String(artwork.year) : undefined,
@@ -62,7 +66,7 @@ export default async function ArtworkDetailPage({ params }: Props) {
       '@type': 'Person',
       name: 'Parvane Razaghi',
     },
-    image: artwork.media.map((item) => item.src.full),
+    image: artwork.media.map((item) => absoluteUrl(item.src.full)),
     ...(artwork.price
       ? { offers: { '@type': 'Offer', price: artwork.price } }
       : {}),

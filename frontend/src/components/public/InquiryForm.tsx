@@ -44,10 +44,13 @@ export function InquiryForm({
       message?: string | string[];
     };
     if (!response.ok) {
+      const fallback = 'Could not send the enquiry. Please check the form and try again.';
       setError(
         Array.isArray(data.message)
-          ? data.message.join(', ')
-          : data.message ?? 'Could not send the enquiry.',
+          ? fallback
+          : typeof data.message === 'string' && data.message.trim()
+            ? data.message
+            : fallback,
       );
       setPending(false);
       return;

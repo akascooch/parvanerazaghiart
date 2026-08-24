@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { InquiryForm } from '@/components/public/InquiryForm';
 import { fetchPublicArtwork } from '@/lib/public-gallery';
-import { defaultDescription, siteName, siteUrl } from '@/lib/site';
+import { defaultDescription, defaultOgImage, siteName, siteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,8 +25,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       description,
       url: siteUrl(canonical),
       type: 'website',
+      images: [defaultOgImage],
     },
-    twitter: { card: 'summary', title, description },
+    twitter: { card: 'summary_large_image', title, description, images: [defaultOgImage.url] },
   };
 }
 

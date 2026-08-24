@@ -2,22 +2,37 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { fetchPublicArtworks } from '@/lib/public-gallery';
-import { defaultDescription, siteName, siteUrl } from '@/lib/site';
+import { defaultDescription, ogImages, siteName, siteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
-  title: { absolute: siteName },
-  description: defaultDescription,
-  alternates: { canonical: '/' },
-  openGraph: {
-    title: siteName,
+export async function generateMetadata(): Promise<Metadata> {
+  const featured = (await fetchPublicArtworks()).slice(0, 1)[0];
+  const image = featured?.media.find((item) => item.isPrimary) ?? featured?.media[0];
+  const images = ogImages(
+    image
+      ? { url: image.src.preview, alt: image.alt ?? featured?.title }
+      : undefined,
+  );
+  return {
+    title: { absolute: siteName },
     description: defaultDescription,
-    url: siteUrl('/'),
-    type: 'website',
-  },
-  twitter: { card: 'summary_large_image', title: siteName, description: defaultDescription },
-};
+    alternates: { canonical: '/' },
+    openGraph: {
+      title: siteName,
+      description: defaultDescription,
+      url: siteUrl('/'),
+      type: 'website',
+      images,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteName,
+      description: defaultDescription,
+      images: images.map((item) => item.url),
+    },
+  };
+}
 
 export default async function HomePage() {
   const artworks = (await fetchPublicArtworks()).slice(0, 3);

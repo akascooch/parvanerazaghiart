@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { defaultOgImage } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,9 +15,11 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Parvane Razaghi Art",
+    images: [defaultOgImage],
   },
   twitter: {
     card: "summary_large_image",
+    images: [defaultOgImage.url],
   },
   robots: { index: true, follow: true },
 };

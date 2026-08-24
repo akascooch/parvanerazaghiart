@@ -123,4 +123,15 @@ describe('Public inquiries (e2e)', () => {
   it('rejects unauthenticated admin listing', async () => {
     await request(app.getHttpServer()).get('/api/admin/inquiries').expect(401);
   });
+
+  it('returns a sanitized validation error without DTO metadata', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/public/inquiries')
+      .send({ name: 'A', contact: 'x', message: 'short' })
+      .expect(400);
+    expect(res.body.message).toBe('Please check the form and try again.');
+    expect(JSON.stringify(res.body)).not.toMatch(
+      /must be|class-validator|CreateInquiryDto/i,
+    );
+  });
 });

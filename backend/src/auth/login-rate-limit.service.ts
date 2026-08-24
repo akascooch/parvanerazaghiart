@@ -1,25 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { MemoryRateLimitStore } from '../common/memory-rate-limit';
 import { LOGIN_MAX_ATTEMPTS, LOGIN_WINDOW_MS } from './auth.constants';
 
-type AttemptState = {
-  count: number;
-  resetAt: number;
-};
-
+/** In-process limiter. Keep PM2 `instances: 1` until Redis is introduced. */
 @Injectable()
 export class LoginRateLimitService {
-  private readonly attempts = new Map<string, AttemptState>();
+  private readonly store = new MemoryRateLimitStore();
 
   assertAllowed(key: string): void {
-    this.prune();
-    const now = Date.now();
-    const current = this.attempts.get(key);
-
-    if (!current || now >= current.resetAt) {
-      return;
-    }
-
-    if (current.count >= LOGIN_MAX_ATTEMPTS) {
+    const bucket = this.store.current(key);
+    if (bucket && bucket.count >= LOGIN_MAX_ATTEMPTS) {
       throw new HttpException(
         'Too many login attempts. Try again later.',
         HttpStatus.TOO_MANY_REQUESTS,
@@ -28,28 +18,10 @@ export class LoginRateLimitService {
   }
 
   recordFailure(key: string): void {
-    const now = Date.now();
-    const current = this.attempts.get(key);
-
-    if (!current || now >= current.resetAt) {
-      this.attempts.set(key, { count: 1, resetAt: now + LOGIN_WINDOW_MS });
-      return;
-    }
-
-    current.count += 1;
-    this.attempts.set(key, current);
+    this.store.increment(key, LOGIN_WINDOW_MS);
   }
 
   reset(key: string): void {
-    this.attempts.delete(key);
-  }
-
-  private prune(): void {
-    const now = Date.now();
-    for (const [key, value] of this.attempts) {
-      if (now >= value.resetAt) {
-        this.attempts.delete(key);
-      }
-    }
+    this.store.reset(key);
   }
 }

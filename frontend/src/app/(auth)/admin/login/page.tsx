@@ -1,8 +1,10 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { LoginForm } from '@/components/admin/LoginForm';
 
-export const metadata = {
-  title: 'Admin login — Parvane Razaghi Art',
+export const metadata: Metadata = {
+  title: 'Admin login',
+  robots: { index: false, follow: false },
 };
 
 export default function AdminLoginPage() {

@@ -68,6 +68,9 @@ pnpm --dir frontend start
 6. Keep `MEDIA_ROOT` off the public web tree.
 7. Install `sharp` on the server only if registry/ACL allows it; otherwise keep the PNG fallback.
 8. Reverse-proxy `/` to Next; do not expose Nest publicly if avoidable.
+9. Use `ecosystem.config.cjs` with PM2 (`node dist/main.js` and `next start`). Keep `instances: 1` until Redis backs rate limits.
+10. Install the Nginx template in `docs/nginx/parvanerazaghiart.conf` after TLS files exist.
+11. Follow `docs/PRISMA_LINUX.md`: `prisma generate` on Linux, then `prisma migrate deploy` only.
 
 ## Intentionally deferred
 
