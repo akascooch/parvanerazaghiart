@@ -1,15 +1,15 @@
 /**
  * PM2 process file for a Linux host.
  *
- * Usage (from the repository root, after build):
+ * Start from any directory; paths are resolved from this file:
  *   pm2 start ecosystem.config.cjs
  *
  * Rate limiting is in-process memory. Keep `instances: 1` (fork) until Redis
- * is introduced. Cluster (`instances: 'max'`) is structurally ready but would
- * split counters per worker.
+ * is introduced. Do not set wait_ready: Nest does not send process.send('ready').
  *
  * Do not use pnpm/npm as PID 1. Nest loads `backend/.env` from cwd.
  * Next loads `frontend/.env.production` / `.env.local` from cwd.
+ * Logs are written under <repo>/logs (gitignored, not a public web root).
  */
 const path = require('path');
 
@@ -33,7 +33,6 @@ module.exports = {
       restart_delay: 4000,
       exp_backoff_restart_delay: 200,
       kill_timeout: 8000,
-      listen_timeout: 10000,
       env: {
         NODE_ENV: 'production',
         PORT: '3001',
@@ -59,7 +58,6 @@ module.exports = {
       restart_delay: 4000,
       exp_backoff_restart_delay: 200,
       kill_timeout: 8000,
-      listen_timeout: 15000,
       env: {
         NODE_ENV: 'production',
         PORT: '3000',

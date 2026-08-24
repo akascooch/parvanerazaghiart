@@ -28,10 +28,10 @@ Backend (`backend/.env`), aligned with `backend/.env.example`:
 - `MEDIA_ROOT`
 - `ADMIN_EMAIL`, `ADMIN_PHONE`, `ADMIN_PASSWORD`, `ADMIN_NAME` (seed only)
 
-Optional backend:
+Optional backend (local-dev fallback only — production must set dedicated values):
 
-- `MEDIA_SIGNING_SECRET` (falls back to `JWT_SECRET`)
-- `INQUIRY_HASH_SECRET` (falls back to `JWT_SECRET`)
+- `MEDIA_SIGNING_SECRET` — required in production; local fallback to `JWT_SECRET` is for workstation only
+- `INQUIRY_HASH_SECRET` — required in production; local fallback to `JWT_SECRET` is for workstation only
 - Prisma engine path overrides when `binaries.prisma.sh` is blocked
 
 Frontend (`frontend/.env.local`):
@@ -65,6 +65,8 @@ pnpm --dir frontend start
 3. Back up production Postgres, then `prisma migrate deploy`.
 4. Seed admin once; keep seed idempotent.
 5. Set `CORS_ORIGIN` and `NEXT_PUBLIC_SITE_URL` to the public HTTPS origin.
+   Set dedicated `JWT_SECRET`, `JWT_REFRESH_SECRET`, `MEDIA_SIGNING_SECRET`, and
+   `INQUIRY_HASH_SECRET`. Do not reuse local secrets. Do not rely on JWT fallback.
 6. Keep `MEDIA_ROOT` off the public web tree.
 7. Install `sharp` on the server only if registry/ACL allows it; otherwise keep the PNG fallback.
 8. Reverse-proxy `/` to Next; do not expose Nest publicly if avoidable.
