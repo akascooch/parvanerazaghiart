@@ -4,6 +4,15 @@ const nextConfig = {
   images: {
     remotePatterns: [],
   },
+  async redirects() {
+    return [
+      {
+        source: '/login',
+        destination: '/admin/login',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

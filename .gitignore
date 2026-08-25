@@ -17,8 +17,15 @@ prisma-engines-manual/
 # scripts/ is tracked. Generated .env.production is ignored by .env.*
 Local Info.txt
 Server Info.txt
+Origin Certificate.txt
+Private Key.txt
+origin.crt
+origin.key
 *.pem
 *.key
+*.crt
+*.pfx
+*.p12
 credentials*.json
 
 # Build / output

@@ -23,14 +23,10 @@ export function LoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json().catch(() => ({}));
+      await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        setError(
-          typeof data.message === 'string'
-            ? data.message
-            : 'Invalid email or password',
-        );
+        setError('Invalid email or password');
         return;
       }
 

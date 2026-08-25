@@ -17,8 +17,7 @@ if (fs.existsSync(path.join(engines, 'query_engine.dll.node'))) {
   process.env.PRISMA_ENGINES_CHECKSUM_IGNORE_CHECKS = '1';
 }
 
-function loadEnvFile() {
-  const envPath = path.join(__dirname, '..', '.env');
+function applyEnvFile(envPath) {
   if (!fs.existsSync(envPath)) {
     return;
   }
@@ -43,6 +42,12 @@ function loadEnvFile() {
       process.env[key] = value;
     }
   }
+}
+
+function loadEnvFiles() {
+  const backendDir = path.join(__dirname, '..');
+  applyEnvFile(path.join(backendDir, '.env.production'));
+  applyEnvFile(path.join(backendDir, '.env'));
 }
 
 function normalizePhone(value) {
@@ -89,7 +94,15 @@ function readJpegSize(buffer) {
 const prisma = new PrismaClient();
 
 async function seedAdmin() {
-  loadEnvFile();
+  loadEnvFiles();
+  const adminCount = await prisma.user.count({
+    where: { role: UserRole.ADMIN },
+  });
+  if (adminCount > 0) {
+    console.log('[seed] Admin user already exists — credentials left unchanged.');
+    return;
+  }
+
   const phone = normalizePhone(process.env.ADMIN_PHONE || '');
   const password = process.env.ADMIN_PASSWORD || '';
   const name = process.env.ADMIN_NAME || 'Gallery Admin';
@@ -105,40 +118,21 @@ async function seedAdmin() {
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
-  const existing =
-    (phone && (await prisma.user.findUnique({ where: { phone } })))
-    || (email && (await prisma.user.findUnique({ where: { email } })))
-    || null;
-
-  if (existing) {
-    await prisma.user.update({
-      where: { id: existing.id },
-      data: {
-        email: email || existing.email,
-        phone: phone || existing.phone,
-        passwordHash,
-        name,
-        role: UserRole.ADMIN,
-        isActive: true,
-      },
-    });
-  } else {
-    await prisma.user.create({
-      data: {
-        email,
-        phone,
-        passwordHash,
-        name,
-        role: UserRole.ADMIN,
-        isActive: true,
-      },
-    });
-  }
-
-  console.log(`[seed] Admin user ready${phone ? ` (phone set)` : ''}: ${email}`);
+  await prisma.user.create({
+    data: {
+      email,
+      phone,
+      passwordHash,
+      name,
+      role: UserRole.ADMIN,
+      isActive: true,
+    },
+  });
+  console.log('[seed] Admin user created.');
 }
 
 async function seedSampleArtwork() {
+  loadEnvFiles();
   const paintingsDir = path.join(
     __dirname,
     '..',
@@ -264,8 +258,15 @@ async function seedSampleArtwork() {
 }
 
 async function main() {
-  await seedAdmin();
-  await seedSampleArtwork();
+  loadEnvFiles();
+  const sampleOnly = process.env.SEED_SAMPLE_ONLY === '1';
+  const adminOnly = process.env.SEED_ADMIN_ONLY === '1';
+  if (!sampleOnly) {
+    await seedAdmin();
+  }
+  if (!adminOnly) {
+    await seedSampleArtwork();
+  }
 }
 
 main()
