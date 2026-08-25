@@ -185,6 +185,10 @@ if [[ "${CHECK_ONLY}" -eq 1 ]]; then
   exit 0
 fi
 
+# Prisma CLI reads backend/.env. Production secrets are in .env.production.
+# Copy without printing values so migrate/generate can run on Linux hosts.
+install -m 600 "${BACKEND_ENV}" "${ROOT}/backend/.env"
+
 mkdir -p "${ROOT}/logs" "${ROOT}/backend/storage/media"
 
 log "installing backend dependencies (frozen lockfile)"
