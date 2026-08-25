@@ -43,11 +43,17 @@ migrate, with production `ADMIN_*` values in the env used by the seed script.
 
 ## 3. Media and logs
 
+On the production host, uploads live in shared storage, not inside a
+single release tree:
+
 ```bash
-mkdir -p logs backend/storage/media
+# created/linked by scripts/deploy.sh on /var/www/parvanerazaghiart/releases/*
+# /var/www/parvanerazaghiart/shared/storage/media
+# backend/storage/media -> that shared directory
 ```
 
-`MEDIA_ROOT` must stay outside the Nginx document root.
+Workstation / non-release checkouts still use `backend/storage/media` as
+a normal directory. `MEDIA_ROOT` must stay outside the Nginx document root.
 
 ## 4. Deploy
 
@@ -66,11 +72,14 @@ Then:
 The script: checks `node`/`pnpm`/`pm2`/`curl` (nginx/psql/openssl are
 warnings if missing). Frozen installs, Linux `prisma generate` via
 `pnpm exec`, `prisma migrate deploy` (abort on failure before build/PM2),
-builds both apps, `pm2 startOrReload` **only** `parvanerazaghiart-api` and
-`parvanerazaghiart-web` (`instances: 1` is intentional — in-process rate
-limits), then loopback health on `:3000/api/health` and `:3001/api/health`.
-Failed health after reload is **not** auto-rolled-back; restore the previous
-git tag / release directory and rerun deploy.
+builds both apps, links persistent media, then reloads
+`parvanerazaghiart-api` and `parvanerazaghiart-web` (`instances: 1` is
+intentional — in-process rate limits). If PM2 cwd is already this
+release, `startOrReload` is used; a new release directory does delete +
+start so cwd follows `ecosystem.config.cjs`. Then loopback health on
+`:3000/api/health` and `:3001/api/health`. After health, `current` is
+pointed at this tree. Failed health is **not** auto-rolled-back; restore
+the previous release directory and rerun deploy.
 
 `./scripts/deploy.sh --check` validates env and paths only.
 

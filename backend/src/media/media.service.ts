@@ -11,6 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   ALLOWED_IMAGE_MIME,
   MEDIA_MAX_BYTES,
+  MEDIA_MAX_MB,
   MEDIA_MAX_PER_ARTWORK,
 } from './media.constants';
 import { detectImageKind, mimeMatchesDetection } from './image-bytes';
@@ -50,7 +51,7 @@ export class MediaService {
       throw new BadRequestException('File is required');
     }
     if (file.size > MEDIA_MAX_BYTES) {
-      throw new BadRequestException('File exceeds the 8MB limit');
+      throw new BadRequestException(`File exceeds the ${MEDIA_MAX_MB}MB limit`);
     }
     if (!ALLOWED_IMAGE_MIME.has(file.mimetype.toLowerCase())) {
       throw new BadRequestException('Only JPEG, PNG, and WebP images are allowed');

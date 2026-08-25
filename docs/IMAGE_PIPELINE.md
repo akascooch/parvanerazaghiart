@@ -41,9 +41,12 @@ as a server-only extra. The app already treats a failed import as a fallback.
 ## Fallback guarantees
 
 - Magic-byte checks still reject non-images.
-- Size cap remains 8 MiB; max 12 images per artwork.
+- Size cap remains 12 MiB; max 12 images per artwork.
 - Signed URL + published/sold + not-deleted checks still apply.
 - Storage stays under `MEDIA_ROOT` with path-traversal guards.
+- Production releases symlink `backend/storage/media` to
+  `/var/www/parvanerazaghiart/shared/storage/media` so uploads survive
+  new release directories (`scripts/deploy.sh` creates the link).
 - If derivation fails, Nest streams the stored original through the same
   signed public route (passthrough). Clients still cannot list or fetch
   unsigned objects.

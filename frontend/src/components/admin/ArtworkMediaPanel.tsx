@@ -66,7 +66,7 @@ export function ArtworkMediaPanel({
         <div>
           <h2 className="font-display text-2xl">Media</h2>
           <p className="mt-1 text-sm text-white/55">
-            JPEG, PNG, or WebP. Max 8MB, 12 files. Stored privately and served
+            JPEG, PNG, or WebP. Max 12MB, 12 files. Stored privately and served
             only to signed-in admins.
           </p>
         </div>

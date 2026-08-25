@@ -91,6 +91,100 @@ health_api_ok() {
   return 0
 }
 
+# Immutable releases live under /var/www/parvanerazaghiart/releases/<sha>.
+# Shared media survives those trees. Override with PRA_APP_ROOT if needed.
+APP_ROOT="${PRA_APP_ROOT:-}"
+if [[ -z "${APP_ROOT}" ]]; then
+  case "${ROOT}" in
+    /var/www/parvanerazaghiart/releases/*)
+      APP_ROOT="/var/www/parvanerazaghiart"
+      ;;
+  esac
+fi
+SHARED_MEDIA="${APP_ROOT:+${APP_ROOT}/shared/storage/media}"
+
+ensure_persistent_media() {
+  mkdir -p "${ROOT}/logs" "${ROOT}/backend/storage"
+
+  if [[ -z "${APP_ROOT}" ]]; then
+    mkdir -p "${ROOT}/backend/storage/media"
+    log "media: local directory (not a /releases tree)"
+    return 0
+  fi
+
+  mkdir -p "${APP_ROOT}/shared/storage/media"
+  chmod 755 "${APP_ROOT}/shared" "${APP_ROOT}/shared/storage" "${SHARED_MEDIA}" || true
+
+  local release_media="${ROOT}/backend/storage/media"
+  if [[ -L "${release_media}" ]]; then
+    local target shared
+    target="$(readlink -f "${release_media}" || true)"
+    shared="$(readlink -f "${SHARED_MEDIA}")"
+    if [[ "${target}" != "${shared}" ]]; then
+      rm -f "${release_media}"
+      ln -s "${SHARED_MEDIA}" "${release_media}"
+      log "media: retargeted symlink -> shared/storage/media"
+    else
+      log "media: already linked to shared/storage/media"
+    fi
+    return 0
+  fi
+
+  if [[ -d "${release_media}" ]]; then
+    log "media: migrating release directory into shared/storage/media"
+    cp -a "${release_media}/." "${SHARED_MEDIA}/"
+    rm -rf "${release_media}"
+  elif [[ -e "${release_media}" ]]; then
+    die "backend/storage/media exists and is not a directory or symlink"
+  fi
+
+  ln -s "${SHARED_MEDIA}" "${release_media}"
+  log "media: linked backend/storage/media -> shared/storage/media"
+}
+
+point_current_symlink() {
+  if [[ -z "${APP_ROOT}" ]]; then
+    return 0
+  fi
+  ln -sfn "${ROOT}" "${APP_ROOT}/current"
+  log "current -> ${ROOT}"
+}
+
+pm2_api_cwd() {
+  pm2 jlist 2>/dev/null | node -e '
+    let raw = "";
+    process.stdin.setEncoding("utf8");
+    process.stdin.on("data", (chunk) => { raw += chunk; });
+    process.stdin.on("end", () => {
+      try {
+        const list = JSON.parse(raw);
+        const app = Array.isArray(list)
+          ? list.find((item) => item && item.name === "parvanerazaghiart-api")
+          : null;
+        process.stdout.write((app && app.pm2_env && app.pm2_env.pm_cwd) || "");
+      } catch {
+        process.stdout.write("");
+      }
+    });
+  ' || true
+}
+
+reload_pm2_from_this_release() {
+  local expected="${ROOT}/backend"
+  local running
+  running="$(pm2_api_cwd)"
+  if [[ -n "${running}" && "${running}" == "${expected}" ]]; then
+    log "PM2 cwd already this release — startOrReload"
+    pm2 startOrReload "${ROOT}/ecosystem.config.cjs" --env production --update-env \
+      || die "pm2 startOrReload failed"
+    return 0
+  fi
+  log "PM2 cwd switch to this release (delete + start)"
+  pm2 delete parvanerazaghiart-api parvanerazaghiart-web >/dev/null 2>&1 || true
+  pm2 start "${ROOT}/ecosystem.config.cjs" --env production \
+    || die "pm2 start failed"
+}
+
 log "deploy root: ${ROOT}"
 
 need_cmd node
@@ -189,7 +283,7 @@ fi
 # Copy without printing values so migrate/generate can run on Linux hosts.
 install -m 600 "${BACKEND_ENV}" "${ROOT}/backend/.env"
 
-mkdir -p "${ROOT}/logs" "${ROOT}/backend/storage/media"
+ensure_persistent_media
 
 log "installing backend dependencies (frozen lockfile)"
 pnpm --dir backend install --frozen-lockfile
@@ -216,9 +310,8 @@ pnpm --dir backend build || die "backend build failed — aborting before reload
 log "building frontend"
 pnpm --dir frontend build || die "frontend build failed — aborting before reload"
 
-log "PM2 startOrReload named apps only (parvanerazaghiart-api / parvanerazaghiart-web)"
-pm2 startOrReload "${ROOT}/ecosystem.config.cjs" --env production --update-env \
-  || die "pm2 startOrReload failed"
+log "PM2 named apps only (parvanerazaghiart-api / parvanerazaghiart-web)"
+reload_pm2_from_this_release
 
 log "waiting for loopback health"
 ok=0
@@ -243,5 +336,7 @@ if [[ -f /etc/nginx/sites-enabled/parvanerazaghiart.conf || -f /etc/nginx/conf.d
 fi
 
 pm2 save || log "warning: pm2 save failed (process dump not updated)"
+
+point_current_symlink
 
 log "deploy succeeded"
