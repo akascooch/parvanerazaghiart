@@ -8,6 +8,7 @@ import {
 } from '@/lib/auth-cookies';
 import { backendUrl } from '@/lib/backend';
 import { isAccessTokenExpired } from '@/lib/jwt-expiry';
+import { publicAbsoluteUrl } from '@/lib/public-origin';
 
 async function rotateRefresh(refreshToken: string) {
   const upstream = await fetch(backendUrl('/auth/refresh'), {
@@ -43,7 +44,7 @@ function withRotatedCookies(
 }
 
 function clearAndLogin(request: NextRequest) {
-  const login = new URL('/admin/login', request.url);
+  const login = publicAbsoluteUrl(request, '/admin/login');
   login.searchParams.set('from', request.nextUrl.pathname);
   const response = NextResponse.redirect(login);
   response.cookies.set(ACCESS_COOKIE, '', cookieOptions(0));
@@ -59,13 +60,13 @@ export async function middleware(request: NextRequest) {
 
   if (pathname === '/admin/login') {
     if (accessValid) {
-      return NextResponse.redirect(new URL('/admin', request.url));
+      return NextResponse.redirect(publicAbsoluteUrl(request, '/admin'));
     }
     if (refreshToken) {
       const tokens = await rotateRefresh(refreshToken);
       if (tokens) {
         return withRotatedCookies(
-          NextResponse.redirect(new URL('/admin', request.url)),
+          NextResponse.redirect(publicAbsoluteUrl(request, '/admin')),
           tokens,
         );
       }
@@ -80,7 +81,15 @@ export async function middleware(request: NextRequest) {
   if (refreshToken) {
     const tokens = await rotateRefresh(refreshToken);
     if (tokens) {
-      return withRotatedCookies(NextResponse.redirect(request.nextUrl), tokens);
+        return withRotatedCookies(
+          NextResponse.redirect(
+            publicAbsoluteUrl(
+              request,
+              `${request.nextUrl.pathname}${request.nextUrl.search}`,
+            ),
+          ),
+          tokens,
+        );
     }
   }
 

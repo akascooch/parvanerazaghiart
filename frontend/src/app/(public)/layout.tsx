@@ -17,11 +17,16 @@ export default function PublicLayout({
       <SiteHeader />
       <div id="content">{children}</div>
       <footer className="mt-24 border-t border-ink/10">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-8 text-sm text-muted sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-8 text-sm text-muted sm:px-6">
           <p>Parvane Razaghi Art</p>
-          <Link href="/gallery" className="hover:text-ink">
-            Collection
-          </Link>
+          <nav aria-label="Footer" className="flex items-center gap-5">
+            <Link href="/gallery" className="hover:text-ink">
+              Collection
+            </Link>
+            <Link href="/login" className="hover:text-ink">
+              Admin
+            </Link>
+          </nav>
         </div>
       </footer>
     </div>
