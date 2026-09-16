@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
-import { GalleryImage } from '@/components/gallery/GalleryImage';
 import { ArtistTeaser } from '@/components/public/ArtistTeaser';
-import { fetchPublicArtworks, primaryMedia } from '@/lib/public-gallery';
+import { FadeIn } from '@/components/public/FadeIn';
+import { HeroCinematic } from '@/components/public/HeroCinematic';
+import { artist } from '@/data/artist-data';
+import { fetchPublicArtworks } from '@/lib/public-gallery';
 import { defaultDescription, ogImages, siteName, siteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const featured = (await fetchPublicArtworks()).slice(0, 1)[0];
+  const featured = (await fetchPublicArtworks({ limit: 1 }))[0];
   const image = featured?.media.find((item) => item.isPrimary) ?? featured?.media[0];
   const images = ogImages(
     image
@@ -37,60 +38,49 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const artworks = (await fetchPublicArtworks()).slice(0, 3);
-  const featured = artworks[0];
-  const hero = featured ? primaryMedia(featured) : undefined;
+  const artworks = (await fetchPublicArtworks({ limit: 6 })).slice(0, 6);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-      <section className="flex flex-col items-center px-2 pt-16 text-center sm:pt-20">
-        <p className="text-sm uppercase tracking-[0.35em] text-muted">Gallery</p>
-        <h1 className="mt-4 font-display text-4xl tracking-tight md:text-6xl">
-          Parvane Razaghi Art
-        </h1>
-        <p className="mt-5 max-w-md text-muted">
-          A considered collection of paintings, presented with the stillness they
-          were made in.
-        </p>
-        <Link
-          href="/gallery"
-          className="mt-10 border border-ink/20 px-6 py-3 text-sm tracking-wide hover:border-ink/50"
-        >
-          View the collection
-        </Link>
-        {featured && hero ? (
-          <Link
-            href={`/gallery/${featured.slug}`}
-            className="mt-14 block w-full max-w-3xl"
-          >
-            <figure className="overflow-hidden bg-ink/[0.03]">
-              <GalleryImage
-                media={hero}
-                priority
-                sizes="(max-width: 768px) 100vw, 768px"
-                className="aspect-[4/5] w-full object-cover sm:aspect-[5/4]"
-              />
-              <figcaption className="mt-3 text-left text-sm text-muted">
-                {featured.title}
-                {featured.year ? ` · ${featured.year}` : ''}
-              </figcaption>
-            </figure>
-          </Link>
-        ) : null}
-      </section>
+    <main className="pb-24">
+      <HeroCinematic />
 
-      <ArtistTeaser />
+      <FadeIn>
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+          <p className="font-sans text-[11px] uppercase tracking-luxury text-muted">
+            [ 00 — Philosophy ]
+          </p>
+          <blockquote className="mt-6 max-w-3xl font-serif text-2xl font-light italic leading-relaxed text-noir md:text-4xl md:leading-snug">
+            “{artist.statement}”
+          </blockquote>
+        </section>
+      </FadeIn>
 
       {artworks.length > 0 ? (
-        <section aria-labelledby="featured-heading">
-          <h2 id="featured-heading" className="font-display text-2xl">
-            Selected works
-          </h2>
-          <div className="mt-8">
+        <section
+          id="curated-works"
+          aria-labelledby="featured-heading"
+          className="mx-auto max-w-6xl scroll-mt-28 px-4 py-24 sm:px-6"
+        >
+          <FadeIn>
+            <p className="font-sans text-[11px] uppercase tracking-luxury text-muted">
+              [ 01 — Selected works ]
+            </p>
+            <h2
+              id="featured-heading"
+              className="mt-4 font-serif text-4xl font-normal tracking-tight text-noir md:text-5xl"
+            >
+              Curated Selection
+            </h2>
+          </FadeIn>
+          <div className="mt-12">
             <GalleryGrid artworks={artworks} featured />
           </div>
         </section>
       ) : null}
+
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <ArtistTeaser />
+      </div>
     </main>
   );
 }

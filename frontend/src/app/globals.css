@@ -7,28 +7,63 @@
   --foreground: #1a1814;
   --muted: #6b6560;
   --accent: #8b7355;
+  --paper: #f7f4ef;
+  --parchment: #ebe4d8;
+  --noir: #121110;
+  --gold: #9e814d;
+  --ease-luxury: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-html,
-body {
-  min-height: 100%;
+@layer base {
+  html {
+    min-height: 100%;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    min-height: 100%;
+    color: var(--foreground);
+    background:
+      radial-gradient(ellipse at top, #ebe4d8 0%, transparent 55%),
+      linear-gradient(180deg, #f7f4ef 0%, #efe8dc 100%);
+    font-family: var(--font-inter), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
-body {
-  color: var(--foreground);
-  background:
-    radial-gradient(ellipse at top, #ebe4d8 0%, transparent 55%),
-    linear-gradient(180deg, #f7f4ef 0%, #efe8dc 100%);
-  font-family: Georgia, "Times New Roman", serif;
-}
+@layer components {
+  .brand-mark {
+    mix-blend-mode: multiply;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  .glass-panel {
+    background: color-mix(in srgb, #f7f4ef 62%, transparent);
+    border: 1px solid color-mix(in srgb, #1a1814 8%, transparent);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 1px 0 color-mix(in srgb, #ffffff 55%, transparent) inset;
+  }
 
-.brand-mark {
-  mix-blend-mode: multiply;
+  .editorial-heading {
+    font-family: var(--font-cormorant), Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    font-size: clamp(2.25rem, 1.1rem + 5vw, 5.5rem);
+  }
 }
 
 .lightbox {

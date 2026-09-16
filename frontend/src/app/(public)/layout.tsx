@@ -15,7 +15,9 @@ export default function PublicLayout({
         Skip to content
       </a>
       <SiteHeader />
-      <div id="content">{children}</div>
+      <div id="content" className="pt-20">
+        {children}
+      </div>
       <SiteFooter />
     </div>
   );
