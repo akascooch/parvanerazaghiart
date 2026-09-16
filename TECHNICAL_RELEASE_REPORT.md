@@ -14,12 +14,11 @@
 
 | مورد | مقدار |
 |---|---|
-| کامیت انتشار | همان SHA کامیت `chore(release): v1.0.0 final handover and persistent media storage` روی `main` |
+| کامیت انتشار | `3ed9d02` (`chore(release): v1.0.0 final handover and persistent media storage`) |
+| درخت زنده | `/var/www/parvanerazaghiart/releases/3ed9d02` |
+| پیوند `current` | `/var/www/parvanerazaghiart/current` → `releases/3ed9d02` |
 | درخت قبلی (rollback نزدیک) | `/var/www/parvanerazaghiart/releases/77cbb46` |
 | Rollback قدیمی‌تر | `/var/www/parvanerazaghiart/releases/83018ac` |
-| پیوند عملیاتی | `/var/www/parvanerazaghiart/current` → درخت زنده |
-
-پس از استقرار، SHA کوتاه درخت زنده با `readlink -f /var/www/parvanerazaghiart/current` و `git rev-parse --short HEAD` روی `main` یکی است.
 
 Rollback:
 
@@ -80,12 +79,19 @@ Health عمومی `GET /api/health`: `web: ok` و `api: ok`. فیلد جدا ب�
 
 ## حساب ادمین
 
+دو کاربر `ADMIN` روی production همگام و با HTTPS تأیید شدند (رمز در این گزارش نیست):
+
+| شناسهٔ ورود | نمایش‌نام | نقش | Active | ورود HTTPS | `GET /admin` |
+|---|---|---|---|---|---|
+| `09370504588` | Lord7knows | ADMIN | true | 200 + کوکی | 200 |
+| `09192305309` | ParvaneRazaghi | ADMIN | true | 200 + کوکی | 200 |
+
 | مورد | وضعیت |
 |---|---|
-| شناسهٔ ورود | شمارهٔ موبایل کارفرما |
-| نقش | `ADMIN`، فعال |
+| الگوریتم | bcrypt cost 12 (همان seed بومی) |
 | کوکی | `pra_access` / `pra_refresh` — HttpOnly، Secure، SameSite=Lax |
-| الگوریتم رمز | bcrypt cost 12 |
+| ورود نامعتبر | `401` |
+| بدنهٔ BFF | توکن JWT در JSON نیست |
 
 رمز در Git و در این گزارش نیست.
 
@@ -94,3 +100,20 @@ Health عمومی `GET /api/health`: `web: ok` و `api: ok`. فیلد جدا ب�
 ## حکم
 
 انتشار v1.0.0 با ذخیرهٔ پایدار رسانه، سقف آپلود ۱۲ MiB، و بستهٔ تحویل مشتری آماده است.
+
+---
+
+## Sign-off — v1.1.0 (verified live)
+
+| Item | Value |
+|---|---|
+| Release | **v1.1.0** (`2ab895e`) |
+| Date | 16 September 2026 — verified live |
+| Tag | `v1.1.0` (annotated) |
+| Live tree | `/var/www/parvanerazaghiart/releases/2ab895e` |
+| `current` | `/var/www/parvanerazaghiart/current` → `releases/2ab895e` |
+| Immediate rollback | `/var/www/parvanerazaghiart/releases/3ed9d02` |
+| Features | Atelier media ingest, `/about` editorial CV, TECHOOCH footer signature, responsive mobile nav |
+| Health | Loopback `:3000` / `:3001` OK, public HTTPS OK |
+
+Nginx Origin CA vhost was not rewritten. Shared media path is unchanged.
