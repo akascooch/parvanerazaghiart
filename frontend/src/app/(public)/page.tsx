@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GalleryGrid } from '@/components/gallery/GalleryGrid';
 import { GalleryImage } from '@/components/gallery/GalleryImage';
+import { ArtistTeaser } from '@/components/public/ArtistTeaser';
 import { fetchPublicArtworks, primaryMedia } from '@/lib/public-gallery';
 import { defaultDescription, ogImages, siteName, siteUrl } from '@/lib/site';
 
@@ -77,6 +78,8 @@ export default async function HomePage() {
           </Link>
         ) : null}
       </section>
+
+      <ArtistTeaser />
 
       {artworks.length > 0 ? (
         <section aria-labelledby="featured-heading">

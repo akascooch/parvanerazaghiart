@@ -27,6 +27,10 @@ a {
   text-decoration: none;
 }
 
+.brand-mark {
+  mix-blend-mode: multiply;
+}
+
 .lightbox {
   display: none;
 }
