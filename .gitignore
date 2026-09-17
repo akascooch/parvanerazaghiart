@@ -99,3 +99,4 @@ versions/**/*.dump
 versions/**/.pgpass*
 versions/**/*-sensitive.zip
 versions/**/_stage*/
+backup/
