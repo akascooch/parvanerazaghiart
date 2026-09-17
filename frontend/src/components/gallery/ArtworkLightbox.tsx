@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import type { PublicMedia } from '@/types';
-import { GalleryImage } from './GalleryImage';
+import { GalleryImage, mediaAspectStyle } from './GalleryImage';
 
 export function ArtworkLightbox({
   title,
@@ -43,13 +43,14 @@ export function ArtworkLightbox({
           <li key={item.id}>
             <a
               href={`#lightbox-${index}`}
-              className="block overflow-hidden bg-ink/[0.03] focus:outline-none focus:ring-2 focus:ring-ink/40"
+              className="relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden border border-noir/5 bg-parchment p-4 transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-ink/40 sm:p-5 hover:border-gold/30 hover:shadow-lg"
             >
               <GalleryImage
                 media={item}
                 priority={index === 0}
                 sizes="(max-width: 1024px) 100vw, 480px"
-                className="aspect-[4/5] w-full object-cover"
+                className="h-auto w-auto max-h-full max-w-full min-h-0 min-w-0 object-contain drop-shadow-md"
+                style={mediaAspectStyle(item.width, item.height)}
               />
               <span className="sr-only">View larger: {item.alt || title}</span>
             </a>
@@ -75,7 +76,8 @@ export function ArtworkLightbox({
                 media={item}
                 priority={false}
                 sizes="100vw"
-                className="max-h-[86vh] w-auto max-w-full object-contain"
+                className="mx-auto max-h-[86vh] w-auto max-w-full object-contain"
+                style={mediaAspectStyle(item.width, item.height)}
               />
               <p className="mt-3 text-sm text-white/70">{item.alt || title}</p>
               <div className="mt-4 flex items-center justify-between gap-4 text-sm">

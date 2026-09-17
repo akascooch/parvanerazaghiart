@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { PublicArtwork } from '@/types';
 import { formatPublicPrice, primaryMedia } from '@/lib/public-gallery';
-import { GalleryImage } from '@/components/gallery/GalleryImage';
+import { GalleryImage, mediaAspectStyle } from '@/components/gallery/GalleryImage';
 
 function availabilityLabel(status: PublicArtwork['status']): string {
   return status === 'SOLD' ? '[ Private Collection ]' : '[ Available ]';
@@ -22,16 +22,17 @@ export function ArtworkCard({
   return (
     <li className="flex flex-col">
       <Link href={`/gallery/${artwork.slug}`} className="group block">
-        <figure className="overflow-hidden border border-noir/5 bg-paper/50 transition-shadow duration-700 ease-luxury hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)]">
+        <figure className="relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden border border-noir/5 bg-parchment p-4 transition-all duration-500 sm:p-5 group-hover:border-gold/30 group-hover:shadow-lg">
           {media ? (
             <GalleryImage
               media={media}
               priority={priority}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="aspect-[4/5] w-full object-cover transition-transform duration-700 ease-luxury group-hover:scale-[1.025]"
+              className="h-auto w-auto max-h-full max-w-full min-h-0 min-w-0 object-contain drop-shadow-md transition-transform duration-500 ease-out"
+              style={mediaAspectStyle(media.width, media.height)}
             />
           ) : (
-            <div className="flex aspect-[4/5] items-center justify-center font-sans text-xs uppercase tracking-luxury text-muted">
+            <div className="font-sans text-xs uppercase tracking-luxury text-muted">
               Image forthcoming
             </div>
           )}

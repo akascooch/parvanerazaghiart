@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { PublicMedia } from '@/types';
 
 type Props = {
@@ -5,9 +6,26 @@ type Props = {
   sizes: string;
   priority?: boolean;
   className?: string;
+  style?: CSSProperties;
 };
 
-export function GalleryImage({ media, sizes, priority = false, className }: Props) {
+export function mediaAspectStyle(
+  width: number | null | undefined,
+  height: number | null | undefined,
+): CSSProperties | undefined {
+  if (!width || !height) {
+    return undefined;
+  }
+  return { aspectRatio: `${width} / ${height}` };
+}
+
+export function GalleryImage({
+  media,
+  sizes,
+  priority = false,
+  className,
+  style,
+}: Props) {
   return (
     // Native img + srcset: avoids Next image optimizer during mixed dev/prod runtimes.
     // eslint-disable-next-line @next/next/no-img-element
@@ -22,6 +40,7 @@ export function GalleryImage({ media, sizes, priority = false, className }: Prop
       fetchPriority={priority ? 'high' : 'auto'}
       decoding={priority ? 'sync' : 'async'}
       className={className}
+      style={{ ...mediaAspectStyle(media.width, media.height), ...style }}
     />
   );
 }
