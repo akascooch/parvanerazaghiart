@@ -61,7 +61,7 @@ export type ArtistArchive = {
 };
 
 export const artistAssets: ArtistAssets = {
-  logo: '/newv/logo.jpg',
+  logo: '/newv/mainlogo.png',
   logoWidth: 1080,
   logoHeight: 712,
   portrait: '/newv/IMG_20260913_131321_483.jpg',

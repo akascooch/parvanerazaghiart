@@ -45,8 +45,8 @@
 }
 
 @layer components {
-  .brand-mark {
-    mix-blend-mode: multiply;
+  .site-logo {
+    display: block;
   }
 
   .glass-panel {

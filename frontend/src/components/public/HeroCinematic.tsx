@@ -1,8 +1,10 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { AmbientCinemaCanvas } from '@/components/public/AmbientCinemaCanvas';
+import { artist } from '@/data/artist-data';
 
 const luxuryEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -34,9 +36,18 @@ export function HeroCinematic() {
           initial={reduceMotion ? false : { opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.08, ease: luxuryEase }}
-          className="font-serif text-5xl font-normal leading-[0.95] tracking-tight text-noir md:text-7xl lg:text-8xl"
+          aria-label="Parvaneh Razaghi Art"
+          className="max-w-[min(100%,20rem)] sm:max-w-xl md:max-w-2xl lg:max-w-3xl"
         >
-          Parvaneh Razaghi
+          <Image
+            src={artist.assets.logo}
+            alt="Parvaneh Razaghi Art"
+            width={artist.assets.logoWidth}
+            height={artist.assets.logoHeight}
+            priority
+            sizes="(max-width: 640px) 20rem, (max-width: 768px) 36rem, (max-width: 1024px) 42rem, 48rem"
+            className="site-logo h-auto w-full object-contain"
+          />
         </motion.h1>
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 18 }}

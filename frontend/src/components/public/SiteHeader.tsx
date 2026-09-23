@@ -23,7 +23,7 @@ export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const menuId = useId();
   const reduceMotion = useReducedMotion();
-  const { assets, name } = artist;
+  const { assets } = artist;
 
   useEffect(() => {
     setOpen(false);
@@ -71,15 +71,15 @@ export function SiteHeader() {
         <Link
           href="/"
           className="relative flex min-h-11 shrink-0 items-center"
-          aria-label={`${name} — home`}
+          aria-label="Parvaneh Razaghi Art — home"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={assets.logo}
-            alt={name}
+            alt="Parvaneh Razaghi Art"
             width={assets.logoWidth}
             height={assets.logoHeight}
-            className="brand-mark h-9 w-auto sm:h-10 md:h-11"
+            className="site-logo h-9 w-auto sm:h-10 md:h-11"
           />
         </Link>
 
