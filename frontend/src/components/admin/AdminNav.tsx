@@ -8,6 +8,7 @@ const links = [
   { href: '/admin/artworks', label: 'Collection', enabled: true },
   { href: '/admin/categories', label: 'Categories', enabled: true },
   { href: '/admin/inquiries', label: 'Enquiries', enabled: true },
+  { href: '/admin/settings', label: 'Settings', enabled: true },
   { href: '/admin/media', label: 'Media', enabled: false },
 ];
 

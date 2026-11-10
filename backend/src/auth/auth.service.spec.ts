@@ -27,13 +27,14 @@ describe('AuthService', () => {
 
   let service: AuthService;
   let prisma: {
-    user: { findUnique: jest.Mock };
+    user: { findUnique: jest.Mock; update: jest.Mock };
     refreshToken: {
       findUnique: jest.Mock;
       create: jest.Mock;
       update: jest.Mock;
       updateMany: jest.Mock;
     };
+    $transaction: jest.Mock;
   };
   let jwt: { signAsync: jest.Mock; verifyAsync: jest.Mock };
   let rateLimit: {
@@ -44,13 +45,14 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     prisma = {
-      user: { findUnique: jest.fn() },
+      user: { findUnique: jest.fn(), update: jest.fn() },
       refreshToken: {
         findUnique: jest.fn(),
         create: jest.fn(),
         update: jest.fn(),
         updateMany: jest.fn(),
       },
+      $transaction: jest.fn(async (ops: unknown) => ops),
     };
     jwt = {
       signAsync: jest.fn().mockResolvedValue('token'),
@@ -129,5 +131,27 @@ describe('AuthService', () => {
       service.login(user.email, 'wrong-password', 'ip:email'),
     ).rejects.toBeInstanceOf(UnauthorizedException);
     expect(rateLimit.recordFailure).toHaveBeenCalled();
+  });
+
+  it('updates the password hash after verifying the current password', async () => {
+    prisma.user.findUnique.mockResolvedValue(user);
+    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+    (bcrypt.hash as jest.Mock).mockResolvedValue('new-hash');
+    prisma.user.update.mockResolvedValue({});
+    prisma.refreshToken.updateMany.mockResolvedValue({ count: 1 });
+
+    const result = await service.changePassword(
+      user.id,
+      'OldPass12',
+      'NewPass12!',
+      'NewPass12!',
+    );
+
+    expect(result).toEqual({
+      success: true,
+      message: 'Password updated successfully',
+    });
+    expect(bcrypt.hash).toHaveBeenCalledWith('NewPass12!', 12);
+    expect(prisma.$transaction).toHaveBeenCalled();
   });
 });
