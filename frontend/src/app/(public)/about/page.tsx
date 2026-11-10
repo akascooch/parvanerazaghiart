@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FadeIn } from '@/components/public/FadeIn';
-import { StudioVideoCard } from '@/components/public/StudioVideoCard';
 import { artist } from '@/data/artist-data';
 import { ogImages, serializeJsonLd, siteName, siteUrl } from '@/lib/site';
 
@@ -117,12 +116,12 @@ export default function AboutPage() {
               In the studio
             </h2>
             <p className="mt-4 text-muted">
-              A working room of oil, mixed media, and slow looking. The still and the film below
-              are from the studio — not catalogue works.
+              A working room of oil, mixed media, and slow looking. The still below is from the
+              studio — not a catalogue work.
             </p>
           </header>
 
-          <div className="mt-10 grid items-start gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(14rem,0.55fr)] lg:gap-10">
+          <div className="mt-10 max-w-3xl">
             <figure className="overflow-hidden bg-ink/[0.03] ring-1 ring-ink/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -138,13 +137,6 @@ export default function AboutPage() {
                 At the canvas — oil and mixed media, Tehran.
               </figcaption>
             </figure>
-            <div className="mx-auto w-full max-w-xs lg:mx-0 lg:max-w-none">
-              <StudioVideoCard />
-              <p className="mt-3 text-sm text-muted">
-                Studio film, played only when you choose. Reduced-motion visitors may remain with
-                the still.
-              </p>
-            </div>
           </div>
         </section>
       </FadeIn>

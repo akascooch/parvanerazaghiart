@@ -1,11 +1,19 @@
 import type { Metadata } from 'next';
-import { GalleryGrid } from '@/components/gallery/GalleryGrid';
-import { ArtistTeaser } from '@/components/public/ArtistTeaser';
+import nextDynamic from 'next/dynamic';
 import { FadeIn } from '@/components/public/FadeIn';
 import { HeroCinematic } from '@/components/public/HeroCinematic';
 import { artist } from '@/data/artist-data';
 import { fetchPublicArtworks } from '@/lib/public-gallery';
 import { defaultDescription, ogImages, siteName, siteUrl } from '@/lib/site';
+
+const GalleryGrid = nextDynamic(
+  () => import('@/components/gallery/GalleryGrid').then((mod) => mod.GalleryGrid),
+  { ssr: true },
+);
+const ArtistTeaser = nextDynamic(
+  () => import('@/components/public/ArtistTeaser').then((mod) => mod.ArtistTeaser),
+  { ssr: true },
+);
 
 export const dynamic = 'force-dynamic';
 

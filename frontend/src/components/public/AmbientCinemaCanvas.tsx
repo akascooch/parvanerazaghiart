@@ -1,7 +1,7 @@
 'use client';
 
 import { useReducedMotion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type AmbientCinemaCanvasProps = {
@@ -21,12 +21,35 @@ export function AmbientCinemaCanvas({
 }: AmbientCinemaCanvasProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const reduceMotion = useReducedMotion();
+  const [shouldStream, setShouldStream] = useState(false);
 
   useEffect(() => {
     const node = videoRef.current;
     if (!node || reduceMotion) {
       return undefined;
     }
+
+    let cancelled = false;
+    let idleHandle: number | null = null;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+
+    const clearDeferred = () => {
+      if (idleHandle !== null && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle !== null) {
+        clearTimeout(timeoutHandle);
+      }
+      idleHandle = null;
+      timeoutHandle = null;
+    };
+
+    const beginStream = () => {
+      if (cancelled) {
+        return;
+      }
+      setShouldStream(true);
+    };
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -35,13 +58,14 @@ export function AmbientCinemaCanvas({
           return;
         }
         if (entry.isIntersecting) {
-          const playback = node.play();
-          if (playback) {
-            playback.catch(() => {
-              /* Autoplay may be blocked; poster remains visible. */
-            });
+          // Keep the first paint free for HTML/CSS/JS on slow domestic links.
+          if ('requestIdleCallback' in window) {
+            idleHandle = window.requestIdleCallback(beginStream, { timeout: 2500 });
+          } else {
+            timeoutHandle = setTimeout(beginStream, 1200);
           }
         } else {
+          clearDeferred();
           node.pause();
         }
       },
@@ -50,10 +74,26 @@ export function AmbientCinemaCanvas({
 
     observer.observe(node);
     return () => {
+      cancelled = true;
+      clearDeferred();
       observer.disconnect();
       node.pause();
     };
   }, [reduceMotion, videoSrc]);
+
+  useEffect(() => {
+    const node = videoRef.current;
+    if (!node || !shouldStream || reduceMotion) {
+      return;
+    }
+    node.load();
+    const playback = node.play();
+    if (playback) {
+      playback.catch(() => {
+        /* Autoplay may be blocked; poster remains visible. */
+      });
+    }
+  }, [shouldStream, reduceMotion, videoSrc]);
 
   return (
     <div
@@ -78,13 +118,12 @@ export function AmbientCinemaCanvas({
             blurEffect && 'scale-105 blur-[1.5px]',
           )}
           poster={posterSrc}
-          autoPlay
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
         >
-          <source src={videoSrc} type="video/mp4" />
+          {shouldStream ? <source src={videoSrc} type="video/mp4" /> : null}
         </video>
       )}
 

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import { defaultOgImage } from "@/lib/site";
 import "./globals.css";
@@ -26,7 +26,19 @@ export const metadata: Metadata = {
   },
   description:
     "Selected paintings and works on paper by Parvane Razaghi — a quiet public gallery.",
-  applicationName: "Parvane Razaghi Art",
+  applicationName: "Parvaneh Razaghi Art",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black",
+    title: "PR Art",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -38,6 +50,13 @@ export const metadata: Metadata = {
     images: [defaultOgImage.url],
   },
   robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 function FilmGrainOverlay() {
