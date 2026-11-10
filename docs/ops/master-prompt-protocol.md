@@ -85,3 +85,7 @@ Incident lesson: a working Cloudflare dual-path does not imply the login BFF for
 ## 6. Workstation shell rule
 
 PowerShell rewrites `$`, quotes and carriage returns inside `ssh "..."`. For any remote step longer than one simple command, write a bash script, convert it to LF, `scp` it to `/tmp`, and run it with `bash`.
+
+## 7. Live closeout reference
+
+Verified production paths, rollback commands, backup/monitoring gaps, and Iran vs international checks: `docs/ops/production-closeout-runbook.md` (2026-11-10).

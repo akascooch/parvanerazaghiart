@@ -1,9 +1,9 @@
 # Bendaaz Transaction Edit — deploy when origin + local suite are restored
 
-## Blockers observed 2026-11-09
-- Origin `85.208.253.56` unreachable from operator host: TCP **3031 / 22 / 443** all timeout.
-- Public `https://parvanerazaghiart.com` WebFetch timed out.
-- Local deploy source `C:\Users\milad\AppData\Local\Temp\bendaaz-suite\src` was empty (wiped). Cannot surgically patch live app without restoring source from `/var/www/bendaaz/app`.
+## Status (2026-11-10)
+- **Shipped** on `/var/www/bendaaz/app` (server git `a6efd9f`). Authenticated create/PATCH/delete smoke passed; leftovers cleaned.
+- Local editable clone: `C:\scooch\bendaaz` (origin = server path over SSH).
+- Historical blocker (resolved): origin unreachable 2026-11-09; suite under Temp was empty.
 
 ## Confirmed architecture (prior live audit)
 - App: `/var/www/bendaaz/app` · PM2 `bendaaz-web` · `127.0.0.1:3005` · basePath `/bendaaz-app`

@@ -5,7 +5,7 @@ alwaysApply: true
 
 # TECHOOCH Engineering Standard
 
-Act as Principal Software Architect for this repo. Full protocol: `docs/ops/master-prompt-protocol.md`.
+Act as Principal Software Architect for this repo. Full protocol: `docs/ops/master-prompt-protocol.md`. Live ops/rollback: `docs/ops/production-closeout-runbook.md`.
 
 ## Quality gates (all four, every task)
 1. **Deep audit first** — read the real files, `package.json`, Prisma schema, env examples, and live server state before editing. Never guess paths.
