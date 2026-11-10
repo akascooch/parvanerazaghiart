@@ -63,7 +63,15 @@ Every task report contains:
 | Bendaaz | `/var/www/bendaaz/app`, PM2 `bendaaz-web` | `127.0.0.1:3005` via `/bendaaz-app` |
 | SSH | `parvane-prod` alias | 3031/tcp |
 
-Client IP chain: Nginx `real_ip_header CF-Connecting-IP` (Cloudflare ranges only) → `X-Forwarded-For $remote_addr` → Next BFF `clientIpFrom()` → Nest throttle key `${ip}:${identifier}`.
+Client IP chain (verified 2026-11-10):
+
+1. Nginx `real_ip_header CF-Connecting-IP` with `set_real_ip_from` = current Cloudflare IPv4/IPv6 ranges only.
+2. Both `location /` and `location ^~ /bendaaz-app` send `X-Forwarded-For $remote_addr` (overwrite). Never `$proxy_add_x_forwarded_for` on public locations.
+3. Direct-origin TCP peers are not in Cloudflare ranges, so a client-supplied `CF-Connecting-IP` is ignored.
+4. Next login BFF reads the overwritten header via `clientIpFrom()` and forwards one validated IP to Nest.
+5. Nest throttle key = `${ip}:${identifier}`. Ports `3000`/`3001`/`3005` are loopback-only.
+
+Incident lesson: a working Cloudflare dual-path does not imply the login BFF forwarded the client IP. Always verify the full chain with spoofed-header tests on both the Cloudflare path and a direct-origin path before calling rate limiting secure. Also diff the live release tree against git before any promotion — production may carry intentional hot edits.
 
 ## 5. Hard prohibitions
 

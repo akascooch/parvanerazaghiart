@@ -18,11 +18,12 @@ Executive summary (outcome first) → surgical scope (files) → typed code → 
 
 ## Production invariants
 - Traffic: Cloudflare (Full Strict, Origin CA) → Nginx :443 → Next.js `127.0.0.1:3000` (BFF, includes `/api/*`) → NestJS `127.0.0.1:3001`. Nest, Postgres (:5432) and Bendaaz (:3005) stay loopback-only.
-- Nginx resolves the client IP from `CF-Connecting-IP` at server level and sends `X-Forwarded-For $remote_addr`. Next BFF routes must forward that IP to Nest (see `frontend/src/lib/client-ip.ts`).
-- Never replace the live Origin CA vhost with the repo templates in `docs/nginx/`. Back up the vhost, run `nginx -t`, then `systemctl reload nginx`.
-- Main site releases are immutable dirs `/var/www/parvanerazaghiart/releases/<id>` plus a `current` symlink. Media lives in `shared/storage/media`. PM2 apps run as `parvane`, `instances: 1` (in-memory rate limits).
+- Nginx resolves the client IP from `CF-Connecting-IP` only when the TCP peer is in Cloudflare `set_real_ip_from` ranges, then sends `X-Forwarded-For $remote_addr` (overwrite, never `$proxy_add_x_forwarded_for`) for both `/` and `/bendaaz-app`. Direct-origin peers keep their real TCP address; client-supplied `X-Forwarded-For` / `CF-Connecting-IP` must not win.
+- Next BFF login must forward that single validated IP to Nest (see `frontend/src/lib/client-ip.ts`). Nest and Next stay loopback-only (`3000`/`3001`/`3005`).
+- Never replace the live Origin CA vhost with the repo templates in `docs/nginx/`. Back up the vhost, run `nginx -t`, then `systemctl reload nginx`. Keep Cloudflare IP ranges current against https://www.cloudflare.com/ips-v4 and ips-v6.
+- Main site releases are immutable dirs `/var/www/parvanerazaghiart/releases/<id>` plus a `current` symlink. The live tree can hold hot edits beyond the named git SHA — always diff before promoting. Media lives in `shared/storage/media`. PM2 apps run as `parvane`, `instances: 1` / fork (in-memory rate limits).
 - Prisma in production: `migrate deploy` only. Never `migrate reset`, `migrate dev`, `db push --force-reset`, or dropping data.
-- Bendaaz: `/var/www/bendaaz/app` (git repo), PM2 `bendaaz-web`, basePath `/bendaaz-app`. Its integration tests hit the live DB and must clean up after themselves.
+- Bendaaz: `/var/www/bendaaz/app` (git repo on the server; local clone at `C:\scooch\bendaaz` with `origin` = SSH path, not a push target for routine deploys), PM2 `bendaaz-web`, basePath `/bendaaz-app`. Uploads live under `/var/www/bendaaz/storage` (not world-writable). Integration tests hit the live DB and must clean up after themselves.
 - UFW must keep 3031/tcp (SSH), 80 and 443 open. Never `ufw reset` or default-deny without the SSH rule.
 
 ## Secrets
