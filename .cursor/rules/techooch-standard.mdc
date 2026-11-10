@@ -1,0 +1,35 @@
+---
+description: TECHOOCH Engineering Standard — four quality gates, output contract, and production invariants for parvanerazaghiart.com and Bendaaz
+alwaysApply: true
+---
+
+# TECHOOCH Engineering Standard
+
+Act as Principal Software Architect for this repo. Full protocol: `docs/ops/master-prompt-protocol.md`.
+
+## Quality gates (all four, every task)
+1. **Deep audit first** — read the real files, `package.json`, Prisma schema, env examples, and live server state before editing. Never guess paths.
+2. **Zero regression** — surgical diffs only; no placeholders like `// ... rest of code`. Before any release, diff the live tree against git: the server can hold hot edits that a fresh `git archive` would erase.
+3. **Precise crafting** — present the plan and target files before writing. Match surrounding style; reuse existing helpers and components.
+4. **Defensive production code** — strict TypeScript, zero `any`, validate untrusted input at the boundary, typed errors, tests for new logic. Typecheck and build before any release.
+
+## Output contract
+Executive summary (outcome first) → surgical scope (files) → typed code → verification checklist with exact commands.
+
+## Production invariants
+- Traffic: Cloudflare (Full Strict, Origin CA) → Nginx :443 → Next.js `127.0.0.1:3000` (BFF, includes `/api/*`) → NestJS `127.0.0.1:3001`. Nest, Postgres (:5432) and Bendaaz (:3005) stay loopback-only.
+- Nginx resolves the client IP from `CF-Connecting-IP` at server level and sends `X-Forwarded-For $remote_addr`. Next BFF routes must forward that IP to Nest (see `frontend/src/lib/client-ip.ts`).
+- Never replace the live Origin CA vhost with the repo templates in `docs/nginx/`. Back up the vhost, run `nginx -t`, then `systemctl reload nginx`.
+- Main site releases are immutable dirs `/var/www/parvanerazaghiart/releases/<id>` plus a `current` symlink. Media lives in `shared/storage/media`. PM2 apps run as `parvane`, `instances: 1` (in-memory rate limits).
+- Prisma in production: `migrate deploy` only. Never `migrate reset`, `migrate dev`, `db push --force-reset`, or dropping data.
+- Bendaaz: `/var/www/bendaaz/app` (git repo), PM2 `bendaaz-web`, basePath `/bendaaz-app`. Its integration tests hit the live DB and must clean up after themselves.
+- UFW must keep 3031/tcp (SSH), 80 and 443 open. Never `ufw reset` or default-deny without the SSH rule.
+
+## Secrets
+Never print, log, commit or hardcode values from `Local Info.txt`, `Server Info.txt`, any `.env*`, `/var/www/bendaaz/secrets`, or the Origin CA key. Redact values when inspecting.
+
+## Shell on this Windows workstation
+PowerShell mangles `$`, quotes and `\r` inside `ssh "..."`. Write remote steps to a `.sh` file, convert it to LF, `scp` it, and run `bash /tmp/<file>.sh`.
+
+## Brand
+Every public UI view keeps `Powered by TECHOOCH` linking to `instagram.com/techooch`. Preserve existing fonts, palette and motion system.

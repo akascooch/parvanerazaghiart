@@ -7,6 +7,7 @@ import {
   REFRESH_MAX_AGE,
 } from '@/lib/auth-cookies';
 import { backendUrl } from '@/lib/backend';
+import { clientIpFrom } from '@/lib/client-ip';
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -16,9 +17,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Invalid JSON body' }, { status: 400 });
   }
 
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const clientIp = clientIpFrom(request);
+  if (clientIp) {
+    headers['X-Forwarded-For'] = clientIp;
+    headers['X-Real-IP'] = clientIp;
+  }
+
   const upstream = await fetch(backendUrl('/auth/login'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(body),
     cache: 'no-store',
   });
